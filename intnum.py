@@ -46,8 +46,7 @@ class IntegerToEnglishLatin:
         9: _LatinNumeral('non',   'novem',    'nonaginta',    'nongenti')}
 
     def __init__(self, number):
-        assert isinstance(number, int)
-        self.number = number
+        self.number = int(number)
 
     def _triplets(self, number_str):
         num_iter = iter(map(int, reversed(str(number_str))))
