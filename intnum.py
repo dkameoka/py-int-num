@@ -5,15 +5,15 @@ from dataclasses import dataclass
 
 
 @dataclass
-class _EnglishNumeral:
+class _EnglishCardinal:
     units: str
     teens: str
     tens: str
 
 
 @dataclass
-class _LatinNumeral:
-    simplex: str
+class _LatinCardinal:
+    prefix: str
     units: str
     tens: str
     hundreds: str
@@ -21,29 +21,29 @@ class _LatinNumeral:
 
 class IntegerToEnglishLatin:
 
-    ENG_NUM_TABLE = {
-        0: _EnglishNumeral('',      'ten',       ''),
-        1: _EnglishNumeral('one',   'eleven',    ''),
-        2: _EnglishNumeral('two',   'twelve',    'twenty'),
-        3: _EnglishNumeral('three', 'thirteen',  'thirty'),
-        4: _EnglishNumeral('four',  'fourteen',  'forty'),
-        5: _EnglishNumeral('five',  'fifteen',   'fifty'),
-        6: _EnglishNumeral('six',   'sixteen',   'sixty'),
-        7: _EnglishNumeral('seven', 'seventeen', 'seventy'),
-        8: _EnglishNumeral('eight', 'eighteen',  'eighty'),
-        9: _EnglishNumeral('nine',  'nineteen',  'ninety')}
+    ENG_TABLE = {
+        0: _EnglishCardinal('',      'ten',       ''),
+        1: _EnglishCardinal('one',   'eleven',    ''),
+        2: _EnglishCardinal('two',   'twelve',    'twenty'),
+        3: _EnglishCardinal('three', 'thirteen',  'thirty'),
+        4: _EnglishCardinal('four',  'fourteen',  'forty'),
+        5: _EnglishCardinal('five',  'fifteen',   'fifty'),
+        6: _EnglishCardinal('six',   'sixteen',   'sixty'),
+        7: _EnglishCardinal('seven', 'seventeen', 'seventy'),
+        8: _EnglishCardinal('eight', 'eighteen',  'eighty'),
+        9: _EnglishCardinal('nine',  'nineteen',  'ninety')}
 
-    LAT_NUM_TABLE = {
-        0: _LatinNumeral('n',     '',         '',             ''),
-        1: _LatinNumeral('m',     'un',       'deci',         'centi'),
-        2: _LatinNumeral('b',     'duo',      'viginti',      'ducenti'),
-        3: _LatinNumeral('tr',    'tre',      'triginta',     'trecenti'),
-        4: _LatinNumeral('quadr', 'quattuor', 'quadraginta',  'quadringenti'),
-        5: _LatinNumeral('quint', 'quin',     'quinquaginta', 'quingenti'),
-        6: _LatinNumeral('sext',  'sex',      'sexaginta',    'sescenti'),
-        7: _LatinNumeral('sept',  'septen',   'septuaginta',  'septingenti'),
-        8: _LatinNumeral('oct',   'octo',     'octoginta',    'octingenti'),
-        9: _LatinNumeral('non',   'novem',    'nonaginta',    'nongenti')}
+    LAT_TABLE = {
+        0: _LatinCardinal('n',     '',         '',             ''),
+        1: _LatinCardinal('m',     'un',       'deci',         'centi'),
+        2: _LatinCardinal('b',     'duo',      'viginti',      'ducenti'),
+        3: _LatinCardinal('tr',    'tre',      'triginta',     'trecenti'),
+        4: _LatinCardinal('quadr', 'quattuor', 'quadraginta',  'quadringenti'),
+        5: _LatinCardinal('quint', 'quin',     'quinquaginta', 'quingenti'),
+        6: _LatinCardinal('sext',  'sex',      'sexaginta',    'sescenti'),
+        7: _LatinCardinal('sept',  'septen',   'septuaginta',  'septingenti'),
+        8: _LatinCardinal('oct',   'octo',     'octoginta',    'octingenti'),
+        9: _LatinCardinal('non',   'novem',    'nonaginta',    'nongenti')}
 
     def __init__(self, number):
         self.number = int(number)
@@ -55,17 +55,17 @@ class IntegerToEnglishLatin:
     def _english_cardinal_numeral(self, units, tens, hundreds):
         result = []
         if hundreds > 0:
-            result.append(self.ENG_NUM_TABLE[hundreds].units + ' hundred')
+            result.append(self.ENG_TABLE[hundreds].units + ' hundred')
         if tens > 0:
             if tens == 1:
-                result.append(self.ENG_NUM_TABLE[units].teens)
+                result.append(self.ENG_TABLE[units].teens)
             elif units > 0:
                 result.append(
-                    self.ENG_NUM_TABLE[tens].tens + '-' + self.ENG_NUM_TABLE[units].units)
+                    self.ENG_TABLE[tens].tens + '-' + self.ENG_TABLE[units].units)
             else:
-                result.append(self.ENG_NUM_TABLE[tens].tens)
+                result.append(self.ENG_TABLE[tens].tens)
         else:
-            result.append(self.ENG_NUM_TABLE[units].units)
+            result.append(self.ENG_TABLE[units].units)
         return ' '.join(filter(len, result))
 
     def _latin_from_short_scale(self, exp_short_scale):
@@ -74,13 +74,13 @@ class IntegerToEnglishLatin:
         result = []
         for units, tens, hundreds in self._triplets(exp_short_scale):
             if hundreds == 0 and tens == 0:
-                result.insert(0, self.LAT_NUM_TABLE[units].simplex + 'illi')
+                result.insert(0, self.LAT_TABLE[units].prefix + 'illi')
                 continue
             if hundreds == 1 and tens == 0 and units == 3:  # Special case for 103
                 result.insert(0, 'trescentilli')
                 continue
-            part = self.LAT_NUM_TABLE[units].units + \
-                self.LAT_NUM_TABLE[tens].tens + self.LAT_NUM_TABLE[hundreds].hundreds
+            part = self.LAT_TABLE[units].units + \
+                self.LAT_TABLE[tens].tens + self.LAT_TABLE[hundreds].hundreds
             if part[-1] in ['a', 'e', 'o']:  # Replace some endings
                 part = part[:-1] + 'i'
             part += 'lli'
