@@ -45,9 +45,6 @@ class IntegerToEnglishLatin:
         8: _LatinCardinal('oct',   'octo',     'octoginta',    'octingenti'),
         9: _LatinCardinal('non',   'novem',    'nonaginta',    'nongenti')}
 
-    def __init__(self, number):
-        self.number = int(number)
-
     def _triplets(self, number_str):
         num_iter = iter(map(int, reversed(str(number_str))))
         return itertools.zip_longest(num_iter, num_iter, num_iter, fillvalue=0)
@@ -87,15 +84,16 @@ class IntegerToEnglishLatin:
             result.insert(0, part)
         return ''.join(filter(len, result)) + 'on'
 
-    def __str__(self):
-        if self.number == 0:
+    def __call__(self,number):
+        number = int(number)
+        if number == 0:
             return 'zero'
         result = []
         negative = ''
-        if self.number < 0:
-            self.number = -self.number
+        if number < 0:
+            number = -number
             negative = 'negative '
-        for triplet_index, (units, tens, hundreds) in enumerate(self._triplets(self.number)):
+        for triplet_index, (units, tens, hundreds) in enumerate(self._triplets(number)):
             numeral = self._english_cardinal_numeral(units, tens, hundreds)
             if len(numeral) == 0:
                 continue
